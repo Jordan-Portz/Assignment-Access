@@ -27,7 +27,7 @@ export default function App() {
             <AppBar position="static" color="primary" elevation={1}>
                 <Toolbar>
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                        Interview Starter
+                        Access Suggestions
                     </Typography>
                     <Tooltip
                         title={`Switch to ${mode === "light" ? "dark" : "light"} mode`}
@@ -43,7 +43,7 @@ export default function App() {
                 </Toolbar>
             </AppBar>
             <Container
-                maxWidth="xl"
+                maxWidth="lg"
                 sx={{
                     pt: 3,
                     flex: 1,
