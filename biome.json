@@ -1,0 +1,87 @@
+{
+    "$schema": "https://biomejs.dev/schemas/2.4.11/schema.json",
+    "vcs": {
+        "enabled": true,
+        "clientKind": "git",
+        "useIgnoreFile": true
+    },
+    "files": {
+        "includes": [
+            "resources/js/**/*.{js,jsx}",
+            "vite.config.js"
+        ]
+    },
+    "linter": {
+        "enabled": true,
+        "rules": {
+            "recommended": true,
+            "a11y": {
+                "recommended": true
+            },
+            "complexity": {
+                "recommended": true,
+                "noUselessFragments": "warn"
+            },
+            "correctness": {
+                "recommended": true,
+                "noUnusedVariables": "warn",
+                "noUnusedImports": "error",
+                "useExhaustiveDependencies": "warn",
+                "useHookAtTopLevel": "error"
+            },
+            "style": {
+                "recommended": true,
+                "noNegationElse": "off",
+                "useImportType": "off",
+                "useSelfClosingElements": "warn"
+            },
+            "suspicious": {
+                "recommended": true,
+                "noExplicitAny": "off",
+                "noArrayIndexKey": "warn"
+            }
+        }
+    },
+    "formatter": {
+        "enabled": true,
+        "indentStyle": "space",
+        "indentWidth": 4,
+        "lineWidth": 120,
+        "lineEnding": "lf"
+    },
+    "javascript": {
+        "formatter": {
+            "enabled": true,
+            "quoteStyle": "double",
+            "jsxQuoteStyle": "double",
+            "trailingCommas": "es5",
+            "semicolons": "always",
+            "arrowParentheses": "always",
+            "bracketSpacing": true,
+            "bracketSameLine": false
+        },
+        "linter": {
+            "enabled": true
+        }
+    },
+    "json": {
+        "formatter": {
+            "enabled": true,
+            "indentWidth": 4
+        }
+    },
+    "overrides": [
+        {
+            "includes": [
+                "vite.config.js"
+            ],
+            "linter": {
+                "rules": {
+                    "correctness": {
+                        "noNodejsModules": "off"
+                    }
+                }
+            }
+        }
+    ]
+}
