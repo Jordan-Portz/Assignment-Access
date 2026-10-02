@@ -2,17 +2,19 @@
 
 namespace Database\Factories;
 
-use App\Enums\TaskStatus;
+use App\Enums\SuggestionStatus;
+use App\Enums\SuggestionCategory;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-class TaskFactory extends Factory
+class SuggestionFactory extends Factory
 {
     public function definition(): array
     {
         return [
             'title' => $this->faker->sentence(4, false),
             'description' => $this->faker->optional(0.7)->paragraph(),
-            'status' => $this->faker->randomElement(TaskStatus::cases()),
+            'status' => $this->faker->randomElement(SuggestionStatus::cases()),
+            'category' => $this->faker->randomElement(SuggestionCategory::cases()),
         ];
     }
 }

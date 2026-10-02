@@ -6,19 +6,26 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
-        Schema::create('tasks', function (Blueprint $table) {
+        Schema::create('suggestions', function (Blueprint $table) {
             $table->id();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->enum('status', ['todo', 'in_progress', 'done'])->default('todo');
+            $table->enum('category', ['process', 'product', 'member_experience'])->default('process');
+            $table->enum('status', ['under_review', 'planned', 'implemented', 'declined'])->default('under_review');
             $table->timestamps();
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
-        Schema::dropIfExists('tasks');
+        Schema::dropIfExists('suggestions');
     }
 };

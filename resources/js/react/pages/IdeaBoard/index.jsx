@@ -1,15 +1,15 @@
 import {
     Box,
     Button,
+    CircularProgress,
     MenuItem,
     Modal,
     TextField,
-    Select,
     Typography,
 } from "@mui/material";
 import { AddBox } from "@mui/icons-material";
-import { useQuery } from "@tanstack/react-query";
-import { api } from "../../lib/api";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/react/lib/api";
 import Suggestion from "@/react/components/Suggestion";
 import { useState } from "react";
 
@@ -19,43 +19,57 @@ export default function IdeaBoard() {
     const handleClose = () => setOpen(false);
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [type, setType] = useState("");
+    const [category, setCategory] = useState("");
     const [titleTouched, setTitleTouched] = useState(false);
     const [descriptionTouched, setDescriptionTouched] = useState(false);
-    // const {
-    //     data: tasks,
-    //     isPending,
-    //     isError,
-    // } = useQuery({
-    //     queryKey: ["tasks"],
-    //     queryFn: api.getTasks,
-    // });
+    const queryClient = useQueryClient();
 
-    // if (isPending) {
-    //     return (
-    //         <Box sx={{ display: "flex", justifyContent: "center", pt: 8 }}>
-    //             <CircularProgress />
-    //         </Box>
-    //     );
-    // }
+    const createSuggestionMutation = useMutation({
+        mutationFn: api.createSuggestion,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["suggestions"] });
+            setTitle("");
+            setDescription("");
+            setCategory("");
+            setTitleTouched(false);
+            setDescriptionTouched(false);
+            handleClose();
+        },
+    });
 
-    // if (isError) {
-    //     return (
-    //         <Typography color="error" sx={{ pt: 4 }}>
-    //             Failed to load tasks.
-    //         </Typography>
-    //     );
-    // }
+    const {
+        data: suggestions,
+        isPending,
+        isError,
+    } = useQuery({
+        queryKey: ["suggestions"],
+        queryFn: api.getSuggestionsWithComments,
+    });
 
-    function handleAddSuggestion() {
-        console.log("Adding suggestion:", title, description, type);
-        setTitle("");
-        setDescription("");
-        setType("");
-        handleClose();
+    if (isPending) {
+        return (
+            <Box sx={{ display: "flex", justifyContent: "center", pt: 8 }}>
+                <CircularProgress />
+            </Box>
+        );
     }
 
-    // TODO: Move types to enum?
+    if (isError) {
+        return (
+            <Typography color="error" sx={{ pt: 4 }}>
+                Failed to load suggestions.
+            </Typography>
+        );
+    }
+
+    function handleAddSuggestion() {
+        createSuggestionMutation.mutate({
+            title: title.trim(),
+            description: description.trim(),
+            category,
+            status: "under_review",
+        });
+    }
 
     return (
         <Box>
@@ -67,8 +81,10 @@ export default function IdeaBoard() {
             >
                 Add Suggestion
             </Button>
-            <Suggestion title="Test Title" description="Test description" />
-            <Suggestion title="Test Title2" description="Test description2" />
+
+            {suggestions.map((suggestion, id) => {
+                return <Suggestion key={id} suggestion={suggestion} />;
+            })}
 
             <Modal open={open} onClose={handleClose}>
                 <Box
@@ -108,27 +124,39 @@ export default function IdeaBoard() {
                         onBlur={() => setDescriptionTouched(true)}
                         rows={6}
                     />
-                    <Select
-                        label="Type"
-                        value={type}
+                    <TextField
+                        label="Category"
+                        value={category}
+                        select
                         required
-                        onChange={(e) => setType(e.target.value)}
+                        onChange={(e) => setCategory(e.target.value)}
                     >
                         <MenuItem value="process">Process</MenuItem>
                         <MenuItem value="product">Product</MenuItem>
-                        <MenuItem value="memberExperience">
+                        <MenuItem value="member_experience">
                             Member Experience
                         </MenuItem>
-                    </Select>
+                    </TextField>
+                    {createSuggestionMutation.isError && (
+                        <Typography color="error" role="alert">
+                            {createSuggestionMutation.error.message ||
+                                "Failed to add suggestion."}
+                        </Typography>
+                    )}
                     <Button
                         variant="contained"
                         color="primary"
                         onClick={handleAddSuggestion}
                         disabled={
-                            title.trim() === "" || description.trim() === ""
+                            title.trim() === "" ||
+                            description.trim() === "" ||
+                            category === "" ||
+                            createSuggestionMutation.isPending
                         }
                     >
-                        Add
+                        {createSuggestionMutation.isPending
+                            ? "Adding..."
+                            : "Add"}
                     </Button>
                 </Box>
             </Modal>

@@ -1,17 +1,37 @@
-import { Box, Card, CardContent, Typography } from "@mui/material";
+import {
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
+    Box,
+    OutlinedInput,
+    Typography,
+} from "@mui/material";
 import {
     Chat,
+    Send,
     ThumbUpOffAlt,
     ThumbUpAlt,
     ThumbDownOffAlt,
     ThumbDownAlt,
 } from "@mui/icons-material";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { api } from "@/react/lib/api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-export default function Suggestion({ title, description }) {
+export default function Suggestion({ suggestion }) {
     const [vote, setVote] = useState(0);
     const [voteCount, setVoteCount] = useState(0);
     const [commentCount, setCommentCount] = useState(0);
+    const [comment, setComment] = useState("");
+    const queryClient = useQueryClient();
+
+    const createCommentMutation = useMutation({
+        mutationFn: ({ suggestion_id, data }) =>
+            api.createComment(suggestion_id, data),
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["comments"] });
+        },
+    });
 
     function handleThumbsUpClick() {
         setVote(vote === 1 ? 0 : 1);
@@ -21,12 +41,29 @@ export default function Suggestion({ title, description }) {
         setVote(vote === -1 ? 0 : -1);
     }
 
+    function handleAddComment() {
+        createCommentMutation.mutate({
+            suggestion_id: suggestion.id,
+            data: {
+                message: comment.trim(),
+            },
+        });
+    }
+
     return (
-        <Box style={{ marginBottom: "16px" }}>
-            <Card>
-                <CardContent>
-                    <Typography>{title}</Typography>
-                    <Typography>{description}</Typography>
+        <Accordion>
+            <AccordionSummary
+                sx={{
+                    "& .MuiAccordionSummary-content": {
+                        alignItems: "flex-start",
+                        flexDirection: "column",
+                        gap: 1,
+                    },
+                }}
+            >
+                <Typography>{suggestion.title}</Typography>
+                <Typography>{suggestion.description}</Typography>
+                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <div
                         style={{
                             display: "inline-flex",
@@ -72,8 +109,29 @@ export default function Suggestion({ title, description }) {
                         <Chat />
                         <Typography>{commentCount}</Typography>
                     </div>
-                </CardContent>
-            </Card>
-        </Box>
+                </Box>
+            </AccordionSummary>
+            <AccordionDetails>
+                <div>
+                    <OutlinedInput
+                        variant="outlined"
+                        multiline
+                        value={comment}
+                        onChange={(e) => setComment(e.target.value)}
+                        endAdornment={
+                            <Send
+                                color="primary"
+                                disabled={true}
+                                onClick={() => handleAddComment()}
+                            />
+                        }
+                    ></OutlinedInput>
+                </div>
+
+                {suggestion.comments.map((comment, id) => {
+                    return <p key={id}>{comment.message}</p>;
+                })}
+            </AccordionDetails>
+        </Accordion>
     );
 }

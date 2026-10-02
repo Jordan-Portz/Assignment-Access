@@ -28,10 +28,14 @@ async function request(method, path, body) {
 }
 
 export const api = {
-    // Tasks
-    getTasks: () => request("GET", "/tasks"),
-    getTask: (id) => request("GET", `/tasks/${id}`),
-    createTask: (data) => request("POST", "/tasks", data),
-    updateTask: (id, data) => request("PATCH", `/tasks/${id}`, data),
-    deleteTask: (id) => request("DELETE", `/tasks/${id}`),
+    // Suggestion
+    getSuggestions: () => request("GET", "/suggestions"),
+    getSuggestion: (id) => request("GET", `/suggestions/${id}`),
+    getSuggestionsWithComments: () =>
+        request("GET", "/suggestions/with-comments"),
+    createSuggestion: (data) => request("POST", "/suggestions", data),
+    deleteSuggestion: (id) => request("DELETE", `/suggestions/${id}`),
+    // Comment
+    createComment: (suggestion_id, data) =>
+        request("POST", `/comments/${suggestion_id}`, data),
 };

@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Task;
+use App\Models\Suggestion;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -16,7 +16,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            TaskSeeder::class,
+            SuggestionSeeder::class,
+            CommentSeeder::class,
         ]);
     }
 }
