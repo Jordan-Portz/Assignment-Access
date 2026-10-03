@@ -26,10 +26,10 @@ export default function Suggestion({ suggestion }) {
     const queryClient = useQueryClient();
 
     const createCommentMutation = useMutation({
-        mutationFn: ({ suggestion_id, data }) =>
-            api.createComment(suggestion_id, data),
+        mutationFn: (data) => api.createComment(data),
         onSuccess: async () => {
-            await queryClient.invalidateQueries({ queryKey: ["comments"] });
+            await queryClient.invalidateQueries({ queryKey: ["suggestions"] });
+            setComment("");
         },
     });
 
@@ -44,9 +44,7 @@ export default function Suggestion({ suggestion }) {
     function handleAddComment() {
         createCommentMutation.mutate({
             suggestion_id: suggestion.id,
-            data: {
-                message: comment.trim(),
-            },
+            message: comment.trim(),
         });
     }
 

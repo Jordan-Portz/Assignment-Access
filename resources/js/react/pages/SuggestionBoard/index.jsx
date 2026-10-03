@@ -13,7 +13,7 @@ import { api } from "@/react/lib/api";
 import Suggestion from "@/react/components/Suggestion";
 import { useState } from "react";
 
-export default function IdeaBoard() {
+export default function SuggestionBoard() {
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);

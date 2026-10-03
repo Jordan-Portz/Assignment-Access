@@ -36,6 +36,5 @@ export const api = {
     createSuggestion: (data) => request("POST", "/suggestions", data),
     deleteSuggestion: (id) => request("DELETE", `/suggestions/${id}`),
     // Comment
-    createComment: (suggestion_id, data) =>
-        request("POST", `/comments/${suggestion_id}`, data),
+    createComment: (data) => request("POST", "/comments", data),
 };

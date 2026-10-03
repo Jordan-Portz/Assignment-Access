@@ -3,7 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import App from "./App";
-import IdeaBoard from "./pages/IdeaBoard";
+import SuggestionBoard from "./pages/SuggestionBoard";
 import AppThemeProvider from "./theme/AppThemeProvider";
 
 const rootElement = document.getElementById("root");
@@ -25,7 +25,7 @@ if (rootElement) {
                 <BrowserRouter>
                     <Routes>
                         <Route path="/" element={<App />}>
-                            <Route index element={<IdeaBoard />} />
+                            <Route index element={<SuggestionBoard />} />
                         </Route>
                     </Routes>
                 </BrowserRouter>

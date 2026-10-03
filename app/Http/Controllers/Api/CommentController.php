@@ -10,9 +10,9 @@ use Illuminate\Http\JsonResponse;
 
 class CommentController extends Controller
 {
-    public function store(StoreCommentRequest $request, Suggestion $suggestion): JsonResponse
+    public function store(StoreCommentRequest $request): JsonResponse
     {
-        $comment = $suggestion->comments()->create($request->validated());
+        $comment = Comment::create($request->validated());
 
         return response()->json($comment, 201);
     }
