@@ -79,6 +79,7 @@ export default function SuggestionBoard() {
                 color="primary"
                 endIcon={<AddBox />}
                 onClick={() => handleOpen()}
+                style={{ marginBottom: "16px" }}
             >
                 Add Suggestion
             </Button>

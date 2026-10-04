@@ -3,6 +3,9 @@ import {
     AccordionDetails,
     AccordionSummary,
     Box,
+    Chip,
+    Divider,
+    IconButton,
     OutlinedInput,
     Typography,
 } from "@mui/material";
@@ -18,6 +21,13 @@ import Comment from "@/react/components/Comment";
 import { useState } from "react";
 import { api } from "@/react/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+
+const statusColors = {
+    under_review: "warning",
+    planned: "info",
+    implemented: "success",
+    declined: "error",
+};
 
 export default function Suggestion({ suggestion }) {
     const [comment, setComment] = useState("");
@@ -39,6 +49,12 @@ export default function Suggestion({ suggestion }) {
         });
     }
 
+    function formatEnumName(value) {
+        return value
+            ?.replace(/_/g, " ")
+            .replace(/\b\w/g, (letter) => letter.toUpperCase());
+    }
+
     return (
         <Accordion
             expanded={expanded}
@@ -47,15 +63,63 @@ export default function Suggestion({ suggestion }) {
         >
             <AccordionSummary
                 sx={{
-                    cursor: "auto",
+                    "&.MuiButtonBase-root.MuiAccordionSummary-root": {
+                        cursor: "default",
+                    },
                     "& .MuiAccordionSummary-content": {
                         alignItems: "flex-start",
                         flexDirection: "column",
                         gap: 1,
+                        width: "100%",
                     },
                 }}
             >
-                <Typography>{suggestion?.title}</Typography>
+                <Box sx={{ gap: 0, width: "100%" }}>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            width: "100%",
+                        }}
+                    >
+                        <Typography variant="h6" style={{ marginRight: "8px" }}>
+                            {suggestion?.title}
+                        </Typography>
+                        <Chip
+                            label={formatEnumName(suggestion?.status)}
+                            color={
+                                statusColors[suggestion?.status] ?? "default"
+                            }
+                        />
+                    </Box>
+                    <Box
+                        sx={{
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 1,
+                        }}
+                    >
+                        <Typography
+                            style={{
+                                fontSize: "12px",
+                                fontWeight: "bold",
+                            }}
+                        >
+                            Posted by: {suggestion?.user?.name}
+                        </Typography>
+                        <Divider
+                            orientation="vertical"
+                            variant="middle"
+                            flexItem
+                        />
+                        <Chip
+                            label={formatEnumName(suggestion?.category)}
+                            size="small"
+                            variant="outlined"
+                        />
+                    </Box>
+                </Box>
                 <Typography>{suggestion?.description}</Typography>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <div
@@ -68,7 +132,6 @@ export default function Suggestion({ suggestion }) {
                             padding: "4px 8px",
                             cursor: "pointer",
                         }}
-                        // onClick={handleThumbsUpClick}
                     >
                         {suggestion?.user_vote === 1 ? (
                             <ThumbUpAlt color="success" />
@@ -129,11 +192,17 @@ export default function Suggestion({ suggestion }) {
                         marginBottom: "16px",
                     }}
                     endAdornment={
-                        <Send
+                        <IconButton
                             color="primary"
-                            disabled={true}
+                            disabled={
+                                !comment.trim() ||
+                                createCommentMutation.isPending
+                            }
                             onClick={() => handleAddComment()}
-                        />
+                            style={{ cursor: "pointer" }}
+                        >
+                            <Send />
+                        </IconButton>
                     }
                 ></OutlinedInput>
 

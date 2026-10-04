@@ -11,13 +11,12 @@ class SuggestionController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(Suggestion::with('comments')->withCount([
-                'votes as upvotes' => function ($query) {
-                    $query->where('vote', 1);
-                },
-                'votes as downvotes' => function ($query) {
-                    $query->where('vote', -1);
-                }
+        return response()->json(Suggestion::with([
+                'user:id,name',
+                'comments.user:id,name',
+            ])->withCount([
+                'votes as upvotes' => fn ($query) => $query->where('vote', 1),
+                'votes as downvotes' => fn ($query) => $query->where('vote', -1),
             ])->withAggregate([
                 'votes as user_vote' => function ($query) {
                     $query->where('user_id', 1);

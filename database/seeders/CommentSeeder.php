@@ -12,6 +12,6 @@ class CommentSeeder extends Seeder
         Comment::factory()->createMany([
             ['suggestion_id' => 1, 'message' => 'Wow this is such a good idea!'],
         ]);
-        Comment::factory()->count(40)->create(); 
+        Comment::factory()->count(20)->create(); 
     }
 }

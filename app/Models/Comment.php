@@ -12,11 +12,17 @@ class Comment extends Model
 
     protected $fillable = [
         'suggestion_id',
+        'user_id',
         'message'
     ];
 
-    public function suggestion()
+    public function suggestion(): BelongsTo
     {
         return $this->belongsTo(Suggestion::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }
