@@ -27,7 +27,7 @@ export default function App() {
             <AppBar position="static" color="primary" elevation={1}>
                 <Toolbar>
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                        Access Suggestions
+                        Access Suggest
                     </Typography>
                     <Tooltip
                         title={`Switch to ${mode === "light" ? "dark" : "light"} mode`}

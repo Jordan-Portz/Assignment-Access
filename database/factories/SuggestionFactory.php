@@ -12,7 +12,7 @@ class SuggestionFactory extends Factory
     {
         return [
             'title' => $this->faker->sentence(4, false),
-            'description' => $this->faker->optional(0.7)->paragraph(),
+            'description' => $this->faker->paragraph(),
             'status' => $this->faker->randomElement(SuggestionStatus::cases()),
             'category' => $this->faker->randomElement(SuggestionCategory::cases()),
         ];

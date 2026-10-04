@@ -20,8 +20,8 @@ class VoteFactory extends Factory
     public function definition(): array
     {
         return [
-            'suggestion_id' => Suggestion::factory(),
-            'user_id' => User::factory(),
+            'suggestion_id' => Suggestion::query()->inRandomOrder()->firstOrFail()->id,
+            'user_id' => User::query()->inRandomOrder()->firstOrFail()->id,
             'vote' => $this->faker->randomElement([-1, 1]),
         ];
     }

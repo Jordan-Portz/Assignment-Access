@@ -10,7 +10,7 @@ class CommentFactory extends Factory
     public function definition(): array
     {
         return [
-            'suggestion_id' => Suggestion::factory(),
+            'suggestion_id' => Suggestion::query()->inRandomOrder()->firstOrFail()->id,
             'message' => $this->faker->paragraph(),
         ];
     }

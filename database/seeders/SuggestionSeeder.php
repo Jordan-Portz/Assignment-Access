@@ -12,7 +12,6 @@ class SuggestionSeeder extends Seeder
         Suggestion::factory()->createMany([
             ['title' => 'Improve New Employee Onboarding', 'status' => 'under_review', 'category' => 'process', 'description' => 'Create a centralized onboarding checklist and resource hub for new employees to make the onboarding process more consistent.'],
             ['title' => 'Branch Accessibility Review', 'status' => 'implemented', 'category' => 'member_experience', 'description' => 'Conduct accessibility reviews of branches and identify improvements for members with mobility, hearing, or visual accessibility needs.'],
-            ['title' => 'Test', 'status' => 'implemented', 'category' => 'member_experience', 'description' => 'aaaaaaa.'],
         ]);
     }
 }

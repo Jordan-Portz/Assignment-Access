@@ -12,10 +12,8 @@ class VoteSeeder extends Seeder
      */
     public function run(): void
     {
-        Vote::factory()->createMany([
-            ['suggestion_id' => 1, 'user_id' => 1, 'vote' => -1],
-            ['suggestion_id' => 2, 'user_id' => 1, 'vote' => 1],
-        ]);
-        
+        Vote::factory()->count(50)->make()
+            ->unique(fn (Vote $vote) => "{$vote->suggestion_id}:{$vote->user_id}")
+            ->each(fn (Vote $vote) => $vote->save());
     }
 }

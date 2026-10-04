@@ -4,6 +4,7 @@ import {
     CircularProgress,
     MenuItem,
     Modal,
+    Pagination,
     TextField,
     Typography,
 } from "@mui/material";
@@ -85,6 +86,9 @@ export default function SuggestionBoard() {
             {suggestions.map((suggestion, id) => {
                 return <Suggestion key={id} suggestion={suggestion} />;
             })}
+            {/* <Pagination
+                count={Math.ceil(suggestions?.length / 10)}
+            ></Pagination> */}
 
             <Modal open={open} onClose={handleClose}>
                 <Box
