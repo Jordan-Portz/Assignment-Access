@@ -43,7 +43,7 @@ export default function SuggestionBoard() {
         isError,
     } = useQuery({
         queryKey: ["suggestions"],
-        queryFn: api.getSuggestionsWithComments,
+        queryFn: api.getSuggestions,
     });
 
     if (isPending) {

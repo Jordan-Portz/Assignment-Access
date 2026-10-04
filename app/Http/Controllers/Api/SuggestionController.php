@@ -11,12 +11,18 @@ class SuggestionController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(Suggestion::latest()->get());
-    }
-
-    public function indexWithComments(): JsonResponse
-    {
-        return response()->json(Suggestion::with('comments')->latest()->get());
+        return response()->json(Suggestion::with('comments')->withCount([
+                'votes as upvotes' => function ($query) {
+                    $query->where('vote', 1);
+                },
+                'votes as downvotes' => function ($query) {
+                    $query->where('vote', -1);
+                }
+            ])->withAggregate([
+                'votes as user_vote' => function ($query) {
+                    $query->where('user_id', 1);
+                },
+            ], 'vote')->latest()->get());
     }
 
     public function store(StoreSuggestionRequest $request): JsonResponse
@@ -30,13 +36,6 @@ class SuggestionController extends Controller
     {
         return response()->json($suggestion);
     }
-
-    // public function update(UpdateTaskRequest $request, Task $task): JsonResponse
-    // {
-    //     $task->update($request->validated());
-
-    //     return response()->json($task);
-    // }
 
     public function destroy(Suggestion $suggestion): JsonResponse
     {

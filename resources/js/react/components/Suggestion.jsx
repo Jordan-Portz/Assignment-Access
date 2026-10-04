@@ -14,15 +14,14 @@ import {
     ThumbDownOffAlt,
     ThumbDownAlt,
 } from "@mui/icons-material";
+import Comment from "@/react/components/Comment";
 import { useState } from "react";
 import { api } from "@/react/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function Suggestion({ suggestion }) {
-    const [vote, setVote] = useState(0);
-    const [voteCount, setVoteCount] = useState(0);
-    const [commentCount, setCommentCount] = useState(0);
     const [comment, setComment] = useState("");
+    const [expanded, setExpanded] = useState(false);
     const queryClient = useQueryClient();
 
     const createCommentMutation = useMutation({
@@ -33,25 +32,22 @@ export default function Suggestion({ suggestion }) {
         },
     });
 
-    function handleThumbsUpClick() {
-        setVote(vote === 1 ? 0 : 1);
-    }
-
-    function handleThumbsDownClick() {
-        setVote(vote === -1 ? 0 : -1);
-    }
-
     function handleAddComment() {
         createCommentMutation.mutate({
-            suggestion_id: suggestion.id,
+            suggestion_id: suggestion?.id,
             message: comment.trim(),
         });
     }
 
     return (
-        <Accordion>
+        <Accordion
+            expanded={expanded}
+            disableGutters
+            style={{ marginBottom: "16px" }}
+        >
             <AccordionSummary
                 sx={{
+                    cursor: "auto",
                     "& .MuiAccordionSummary-content": {
                         alignItems: "flex-start",
                         flexDirection: "column",
@@ -59,8 +55,8 @@ export default function Suggestion({ suggestion }) {
                     },
                 }}
             >
-                <Typography>{suggestion.title}</Typography>
-                <Typography>{suggestion.description}</Typography>
+                <Typography>{suggestion?.title}</Typography>
+                <Typography>{suggestion?.description}</Typography>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                     <div
                         style={{
@@ -70,29 +66,16 @@ export default function Suggestion({ suggestion }) {
                             border: "1px solid #ccc",
                             borderRadius: "16px",
                             padding: "4px 8px",
+                            cursor: "pointer",
                         }}
+                        // onClick={handleThumbsUpClick}
                     >
-                        <div
-                            onClick={handleThumbsUpClick}
-                            style={{ cursor: "pointer" }}
-                        >
-                            {vote === 1 ? (
-                                <ThumbUpAlt color="success" />
-                            ) : (
-                                <ThumbUpOffAlt />
-                            )}
-                        </div>
-                        <Typography>{voteCount}</Typography>
-                        <div
-                            onClick={handleThumbsDownClick}
-                            style={{ cursor: "pointer" }}
-                        >
-                            {vote === -1 ? (
-                                <ThumbDownAlt color="error" />
-                            ) : (
-                                <ThumbDownOffAlt />
-                            )}
-                        </div>
+                        {suggestion?.user_vote === 1 ? (
+                            <ThumbUpAlt color="success" />
+                        ) : (
+                            <ThumbUpOffAlt />
+                        )}
+                        <Typography>{suggestion?.upvotes}</Typography>
                     </div>
                     <div
                         style={{
@@ -102,32 +85,60 @@ export default function Suggestion({ suggestion }) {
                             border: "1px solid #ccc",
                             borderRadius: "16px",
                             padding: "4px 8px",
+                            cursor: "pointer",
                         }}
                     >
-                        <Chat />
-                        <Typography>{commentCount}</Typography>
+                        {suggestion?.user_vote === -1 ? (
+                            <ThumbDownAlt color="error" />
+                        ) : (
+                            <ThumbDownOffAlt />
+                        )}
+                        <Typography>{suggestion?.downvotes}</Typography>
                     </div>
+                    <Box
+                        sx={{
+                            display: "inline-flex",
+                            alignItems: "center",
+                            gap: 1,
+                            border: "1px solid #ccc",
+                            borderRadius: "16px",
+                            padding: "4px 8px",
+                            cursor: "pointer",
+                            "&:hover": {
+                                backgroundColor: "action.hover",
+                                borderColor: "text.secondary",
+                            },
+                        }}
+                        onClick={() => setExpanded(!expanded)}
+                    >
+                        <Chat />
+                        <Typography>{suggestion?.comments?.length}</Typography>
+                    </Box>
                 </Box>
             </AccordionSummary>
             <AccordionDetails>
-                <div>
-                    <OutlinedInput
-                        variant="outlined"
-                        multiline
-                        value={comment}
-                        onChange={(e) => setComment(e.target.value)}
-                        endAdornment={
-                            <Send
-                                color="primary"
-                                disabled={true}
-                                onClick={() => handleAddComment()}
-                            />
-                        }
-                    ></OutlinedInput>
-                </div>
+                <OutlinedInput
+                    variant="outlined"
+                    multiline
+                    fullWidth
+                    value={comment}
+                    onChange={(e) => setComment(e.target.value)}
+                    placeholder="Add a comment..."
+                    style={{
+                        padding: "4px 8px",
+                        marginBottom: "16px",
+                    }}
+                    endAdornment={
+                        <Send
+                            color="primary"
+                            disabled={true}
+                            onClick={() => handleAddComment()}
+                        />
+                    }
+                ></OutlinedInput>
 
                 {suggestion.comments.map((comment, id) => {
-                    return <p key={id}>{comment.message}</p>;
+                    return <Comment key={id} comment={comment} />;
                 })}
             </AccordionDetails>
         </Accordion>

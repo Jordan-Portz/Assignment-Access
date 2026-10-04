@@ -31,10 +31,11 @@ export const api = {
     // Suggestion
     getSuggestions: () => request("GET", "/suggestions"),
     getSuggestion: (id) => request("GET", `/suggestions/${id}`),
-    getSuggestionsWithComments: () =>
-        request("GET", "/suggestions/with-comments"),
     createSuggestion: (data) => request("POST", "/suggestions", data),
     deleteSuggestion: (id) => request("DELETE", `/suggestions/${id}`),
+
     // Comment
     createComment: (data) => request("POST", "/comments", data),
+
+    //Vote
 };
