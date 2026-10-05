@@ -8,9 +8,7 @@ use Illuminate\Support\Facades\Route;
 
 // Auth
 Route::post('/login', [AuthController::class, 'login']);
-
 Route::put('/suggestions/{suggestion}/vote', [VoteController::class, 'upsert']);
+Route::post('/suggestions/{suggestion}/comments', [CommentController::class, 'store']);
 
 Route::apiResource('suggestions', SuggestionController::class);
-Route::apiResource('comments', CommentController::class);
-Route::apiResource('votes', VoteController::class);
