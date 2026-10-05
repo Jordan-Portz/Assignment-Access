@@ -8,6 +8,7 @@ const BASE = "/api";
 async function request(method, path, body) {
     const res = await fetch(`${BASE}${path}`, {
         method,
+        credentials: "include",
         headers: {
             "Content-Type": "application/json",
             Accept: "application/json",
@@ -37,5 +38,8 @@ export const api = {
     // Comment
     createComment: (data) => request("POST", "/comments", data),
 
-    //Vote
+    // Vote
+
+    // Login
+    login: (data) => request("POST", "/login", data),
 };

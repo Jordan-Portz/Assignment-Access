@@ -109,7 +109,7 @@ export default function SuggestionBoard() {
                 >
                     <Typography>Add Suggestion</Typography>
                     <TextField
-                        label="Suggestion"
+                        label="Title"
                         variant="outlined"
                         multiline
                         required

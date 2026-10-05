@@ -1,40 +1,25 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
-use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreVoteRequest;
+use App\Models\Suggestion;
+use App\Models\Vote;
+use Illuminate\Http\JsonResponse;
 
 class VoteController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
-    {
-        
-    }
+	public function upsert(StoreVoteRequest $request, Suggestion $suggestion): JsonResponse
+	{
+		$vote = Vote::updateOrCreate(
+			[
+				'suggestion_id' => $suggestion->id,
+				'user_id' => $request->user()->id,
+			],
+			['vote' => $request->validated()['vote']],
+		);
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
-    {
-        
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        
-    }
+		return response()->json($vote);
+	}
 }

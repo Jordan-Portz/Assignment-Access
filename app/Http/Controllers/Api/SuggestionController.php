@@ -26,7 +26,10 @@ class SuggestionController extends Controller
 
     public function store(StoreSuggestionRequest $request): JsonResponse
     {
-        $suggestion = Suggestion::create($request->validated());
+        $suggestion = Suggestion::create([
+            ...$request->validated(),
+            'user_id' => $request->user()->id,
+        ]);
 
         return response()->json($suggestion, 201);
     }
