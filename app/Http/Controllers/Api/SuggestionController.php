@@ -16,8 +16,8 @@ class SuggestionController extends Controller
 
         return response()->json(Suggestion::with([
                 'user:id,name',
-                'comments.user:id,name',
             ])->withCount([
+                'comments',
                 'votes as upvotes' => fn ($query) => $query->where('vote', 1),
                 'votes as downvotes' => fn ($query) => $query->where('vote', -1),
             ])->withAggregate([

@@ -10,6 +10,10 @@ use Illuminate\Http\JsonResponse;
 
 class CommentController extends Controller
 {
+    public function index(Suggestion $suggestion): JsonResponse
+    {
+        return response()->json($suggestion->comments()->with('user:id,name')->latest()->get());
+    }
     public function store(StoreCommentRequest $request, Suggestion $suggestion): JsonResponse
     {
         $comment = Comment::create([

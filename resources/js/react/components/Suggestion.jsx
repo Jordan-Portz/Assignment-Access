@@ -20,7 +20,7 @@ import {
 import Comment from "@/react/components/Comment";
 import { useState } from "react";
 import { api } from "@/react/lib/api";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 const statusColors = {
     under_review: "warning",
@@ -35,19 +35,27 @@ export default function Suggestion({ suggestion }) {
     const queryClient = useQueryClient();
 
     const createCommentMutation = useMutation({
-        mutationFn: (message) => api.createComment(suggestion.id, message),
+        mutationFn: (message) => api.createComment(suggestion?.id, message),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["suggestions"] });
+            await queryClient.invalidateQueries({
+                queryKey: ["comments", suggestion?.id],
+            });
             setComment("");
         },
     });
 
     const voteMutation = useMutation({
-        mutationFn: (vote) => api.setVote(suggestion.id, vote),
-
+        mutationFn: (vote) => api.setVote(suggestion?.id, vote),
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["suggestions"] });
         },
+    });
+
+    const commentsQuery = useQuery({
+        queryKey: ["comments", suggestion?.id],
+        queryFn: () => api.getComments(suggestion?.id),
+        enabled: expanded && !!suggestion?.id,
     });
 
     function handleAddComment() {
@@ -57,7 +65,7 @@ export default function Suggestion({ suggestion }) {
     function handleVote(vote) {
         if (voteMutation.isPending) return;
 
-        voteMutation.mutate(suggestion.user_vote === vote ? 0 : vote);
+        voteMutation.mutate(suggestion?.user_vote === vote ? 0 : vote);
     }
 
     function formatEnumName(value) {
@@ -197,7 +205,7 @@ export default function Suggestion({ suggestion }) {
                         onClick={() => setExpanded(!expanded)}
                     >
                         <Chat />
-                        <Typography>{suggestion?.comments?.length}</Typography>
+                        <Typography>{suggestion?.comments_count}</Typography>
                     </Box>
                 </Box>
             </AccordionSummary>
@@ -228,7 +236,7 @@ export default function Suggestion({ suggestion }) {
                     }
                 ></OutlinedInput>
 
-                {suggestion.comments.map((comment, id) => {
+                {commentsQuery.data?.map((comment, id) => {
                     return <Comment key={id} comment={comment} />;
                 })}
             </AccordionDetails>
