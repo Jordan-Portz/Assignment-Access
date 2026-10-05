@@ -18,23 +18,10 @@ class AuthController extends Controller
 			'password' => ['required', 'string'],
 		]);
 
-		// $user = User::where('email', $request->email)->first();
-		
-		// if (!$user) {
-		// 	throw ValidationException::withMessages([
-		// 		'email' => ['The provided credentials are incorrect.'],
-		// 	]);
-		// }
-
-		// Auth::login($user);
-
-		// return response()->json([
-		// 	'user' => $user
-		// ]);
 		if (!Auth::attempt($credentials)) {
-        return response()->json([
-            'message' => 'Invalid email or password'
-        ], 401);
+        throw ValidationException::withMessages([
+            'login' => ['Invalid email or password.'],
+        ]);
     }
 
     $request->session()->regenerate();
@@ -44,15 +31,14 @@ class AuthController extends Controller
     ]);
 	}
 
-	// public function logout(Request $request): JsonResponse
-	// {
-	// 	Auth::logout();
+	public function logout(Request $request): JsonResponse
+	{
+		Auth::logout();
 
-	// 	$request->session()->invalidate();
-	// 	$request->session()->regenerateToken();
+		$request->session()->invalidate();
 
-	// 	return response()->json(['message' => 'Logged out.']);
-	// }
+		return response()->json(['message' => 'Logged out.']);
+	}
 
 	public function user(Request $request): JsonResponse
 	{

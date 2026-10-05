@@ -197,6 +197,7 @@ export default function Suggestion({ suggestion }) {
                             borderRadius: "16px",
                             padding: "4px 8px",
                             cursor: "pointer",
+                            color: expanded ? "primary.main" : "black",
                             "&:hover": {
                                 backgroundColor: "action.hover",
                                 borderColor: "text.secondary",

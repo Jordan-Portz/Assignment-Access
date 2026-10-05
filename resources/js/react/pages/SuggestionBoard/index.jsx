@@ -104,7 +104,6 @@ export default function SuggestionBoard() {
                         width: 400,
                         p: 2,
                         gap: 1,
-                        backgroundColor: "white",
                     }}
                 >
                     <Typography>Add Suggestion</Typography>

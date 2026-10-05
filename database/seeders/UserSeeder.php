@@ -12,9 +12,14 @@ class UserSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory()->createMany([
-            ['email' => 'test@example.com', 'name' => 'Test User', 'password' => 'test', 'is_supervisor' => true],
-        ]);
+        User::firstOrCreate(
+            ['email' => 'test@example.com'],
+            [
+                'name' => 'Test User',
+                'password' => 'test',
+                'is_supervisor' => true,
+            ]
+        );
         User::factory()->count(20)->create();
     }
 }

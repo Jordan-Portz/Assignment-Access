@@ -47,4 +47,6 @@ export const api = {
 
     // Login
     login: (data) => request("POST", "/login", data),
+    logout: () => request("POST", "/logout"),
+    getCurrentUser: () => request("GET", "/user"),
 };

@@ -1,19 +1,37 @@
-import Brightness4Icon from "@mui/icons-material/Brightness4";
-import Brightness7Icon from "@mui/icons-material/Brightness7";
-import AppBar from "@mui/material/AppBar";
-import Box from "@mui/material/Box";
-import Container from "@mui/material/Container";
-import IconButton from "@mui/material/IconButton";
-import Toolbar from "@mui/material/Toolbar";
-import Tooltip from "@mui/material/Tooltip";
-import Typography from "@mui/material/Typography";
-import { useContext } from "react";
-import { Outlet } from "react-router-dom";
-
-import { ColorModeContext } from "./theme/ColorModeContext";
+import {
+    AppBar,
+    Box,
+    Container,
+    IconButton,
+    Toolbar,
+    Typography,
+} from "@mui/material";
+import { Logout } from "@mui/icons-material";
+import { Outlet, useNavigate } from "react-router-dom";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/react/lib/api";
 
 export default function App() {
-    const { mode, toggleColorMode } = useContext(ColorModeContext);
+    const navigate = useNavigate();
+    const queryClient = useQueryClient();
+
+    const { data: user } = useQuery({
+        queryKey: ["user"],
+        queryFn: api.getCurrentUser,
+        retry: false,
+    });
+
+    const logoutMutation = useMutation({
+        mutationFn: api.logout,
+        onSuccess: async () => {
+            await queryClient.removeQueries({ queryKey: ["user"] });
+            navigate("/");
+        },
+    });
+
+    function handleLogout() {
+        logoutMutation.mutate();
+    }
 
     return (
         <Box
@@ -29,17 +47,23 @@ export default function App() {
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
                         Access Suggest
                     </Typography>
-                    <Tooltip
-                        title={`Switch to ${mode === "light" ? "dark" : "light"} mode`}
-                    >
-                        <IconButton onClick={toggleColorMode} color="inherit">
-                            {mode === "light" ? (
-                                <Brightness4Icon />
-                            ) : (
-                                <Brightness7Icon />
-                            )}
-                        </IconButton>
-                    </Tooltip>
+
+                    {user && user.email && (
+                        <>
+                            <Typography variant="body1">
+                                Logged in as: <strong>{user.name}</strong>
+                            </Typography>
+                            <IconButton
+                                sx={{ color: "inherit" }}
+                                onClick={() => {
+                                    handleLogout();
+                                }}
+                                disabled={logoutMutation.isPending}
+                            >
+                                <Logout />
+                            </IconButton>
+                        </>
+                    )}
                 </Toolbar>
             </AppBar>
             <Container
