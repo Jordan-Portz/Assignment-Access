@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('suggestion_id')->constrained('suggestions')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
-            $table->integer('vote');
+            $table->smallinteger('vote');
             $table->timestamps();
             
             $table->unique(['suggestion_id', 'user_id']);

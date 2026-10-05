@@ -42,11 +42,25 @@ export default function Suggestion({ suggestion }) {
         },
     });
 
+    const voteMutation = useMutation({
+        mutationFn: (vote) => api.setVote(suggestion.id, vote),
+
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({ queryKey: ["suggestions"] });
+        },
+    });
+
     function handleAddComment() {
         createCommentMutation.mutate({
             suggestion_id: suggestion?.id,
             message: comment.trim(),
         });
+    }
+
+    function handleVote(vote) {
+        if (voteMutation.isPending) return;
+
+        voteMutation.mutate(suggestion.user_vote === vote ? 0 : vote);
     }
 
     function formatEnumName(value) {
@@ -122,8 +136,8 @@ export default function Suggestion({ suggestion }) {
                 </Box>
                 <Typography>{suggestion?.description}</Typography>
                 <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
-                    <div
-                        style={{
+                    <Box
+                        sx={{
                             display: "inline-flex",
                             alignItems: "center",
                             gap: "8px",
@@ -131,7 +145,12 @@ export default function Suggestion({ suggestion }) {
                             borderRadius: "16px",
                             padding: "4px 8px",
                             cursor: "pointer",
+                            "&:hover": {
+                                backgroundColor: "action.hover",
+                                borderColor: "text.secondary",
+                            },
                         }}
+                        onClick={() => handleVote(1)}
                     >
                         {suggestion?.user_vote === 1 ? (
                             <ThumbUpAlt color="success" />
@@ -139,9 +158,9 @@ export default function Suggestion({ suggestion }) {
                             <ThumbUpOffAlt />
                         )}
                         <Typography>{suggestion?.upvotes}</Typography>
-                    </div>
-                    <div
-                        style={{
+                    </Box>
+                    <Box
+                        sx={{
                             display: "inline-flex",
                             alignItems: "center",
                             gap: "8px",
@@ -149,15 +168,21 @@ export default function Suggestion({ suggestion }) {
                             borderRadius: "16px",
                             padding: "4px 8px",
                             cursor: "pointer",
+                            "&:hover": {
+                                backgroundColor: "action.hover",
+                                borderColor: "text.secondary",
+                            },
                         }}
+                        onClick={() => handleVote(-1)}
                     >
                         {suggestion?.user_vote === -1 ? (
                             <ThumbDownAlt color="error" />
                         ) : (
                             <ThumbDownOffAlt />
                         )}
+
                         <Typography>{suggestion?.downvotes}</Typography>
-                    </div>
+                    </Box>
                     <Box
                         sx={{
                             display: "inline-flex",

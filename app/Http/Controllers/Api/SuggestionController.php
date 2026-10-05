@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSuggestionRequest;
 use App\Models\Suggestion;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class SuggestionController extends Controller
 {
-    public function index(): JsonResponse
+    public function index(Request $request): JsonResponse
     {
+        $userId = $request->user()?->id;
+
         return response()->json(Suggestion::with([
                 'user:id,name',
                 'comments.user:id,name',
@@ -18,8 +21,8 @@ class SuggestionController extends Controller
                 'votes as upvotes' => fn ($query) => $query->where('vote', 1),
                 'votes as downvotes' => fn ($query) => $query->where('vote', -1),
             ])->withAggregate([
-                'votes as user_vote' => function ($query) {
-                    $query->where('user_id', 1);
+                'votes as user_vote' => function ($query) use ($userId) {
+                    $query->where('user_id', $userId);
                 },
             ], 'vote')->latest()->get());
     }

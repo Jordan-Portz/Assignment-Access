@@ -39,6 +39,8 @@ export const api = {
     createComment: (data) => request("POST", "/comments", data),
 
     // Vote
+    setVote: (suggestionId, vote) =>
+        request("PUT", `/suggestions/${suggestionId}/vote`, { vote }),
 
     // Login
     login: (data) => request("POST", "/login", data),

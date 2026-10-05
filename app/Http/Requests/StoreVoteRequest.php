@@ -23,7 +23,7 @@ class StoreVoteRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'vote' => ['required', 'integer', 'in:-1,1'],
+            'vote' => ['required', 'integer', 'in:-1,0,1'],
         ];
     }
 }
