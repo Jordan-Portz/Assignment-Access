@@ -16,6 +16,7 @@ export default function Login() {
         mutationFn: api.login,
         onSuccess: async (data) => {
             queryClient.setQueryData(["user"], data.user);
+            await queryClient.removeQueries({ queryKey: ["suggestions"] });
             setEmail("");
             setPassword("");
             navigate("/suggestion-board");

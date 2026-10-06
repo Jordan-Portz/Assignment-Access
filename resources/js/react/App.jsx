@@ -65,19 +65,17 @@ export default function App() {
                     )}
                 </Toolbar>
             </AppBar>
-            <Container
-                maxWidth="lg"
+            <Box
                 sx={{
-                    pt: 3,
                     flex: 1,
                     minHeight: 0,
-                    display: "flex",
-                    flexDirection: "column",
-                    overflow: "auto",
+                    overflowY: "auto",
                 }}
             >
-                <Outlet />
-            </Container>
+                <Container maxWidth="lg" sx={{ pt: 3 }}>
+                    <Outlet />
+                </Container>
+            </Box>
         </Box>
     );
 }

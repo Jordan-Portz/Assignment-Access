@@ -12,7 +12,7 @@ class CommentController extends Controller
 {
     public function index(Suggestion $suggestion): JsonResponse
     {
-        return response()->json($suggestion->comments()->with('user:id,name')->latest()->get());
+        return response()->json($suggestion->comments()->with('user:id,name')->oldest()->get());
     }
     public function store(StoreCommentRequest $request, Suggestion $suggestion): JsonResponse
     {

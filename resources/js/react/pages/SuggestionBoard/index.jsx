@@ -81,7 +81,7 @@ export default function SuggestionBoard() {
     }
 
     return (
-        <Box>
+        <>
             <Button
                 variant="contained"
                 color="primary"
@@ -156,6 +156,6 @@ export default function SuggestionBoard() {
                     Add
                 </Button>
             </Modal>
-        </Box>
+        </>
     );
 }
