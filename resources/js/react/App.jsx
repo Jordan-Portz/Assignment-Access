@@ -1,6 +1,7 @@
 import {
     AppBar,
     Box,
+    CircularProgress,
     Container,
     IconButton,
     Toolbar,
@@ -27,6 +28,21 @@ export default function App() {
             navigate("/");
         },
     });
+
+    if (logoutMutation.isPending) {
+        return (
+            <Box
+                sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                }}
+            >
+                <CircularProgress />
+            </Box>
+        );
+    }
 
     function handleLogout() {
         logoutMutation.mutate();

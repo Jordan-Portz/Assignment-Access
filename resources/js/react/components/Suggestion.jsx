@@ -3,7 +3,7 @@ import {
     AccordionDetails,
     AccordionSummary,
     Box,
-    Button,
+    CircularProgress,
     Chip,
     Divider,
     IconButton,
@@ -23,6 +23,7 @@ import {
 } from "@mui/icons-material";
 import Comment from "@/react/components/Comment";
 import Modal from "@/react/components/Modal";
+import LoadingButton from "@/react/components/LoadingButton";
 import { useState } from "react";
 import { api } from "@/react/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -78,7 +79,7 @@ export default function Suggestion({ suggestion }) {
         },
     });
 
-    const commentsQuery = useQuery({
+    const { data: comments, isPending } = useQuery({
         queryKey: ["comments", suggestion?.id],
         queryFn: () => api.getComments(suggestion?.id),
         enabled: expanded && !!suggestion?.id,
@@ -297,14 +298,31 @@ export default function Suggestion({ suggestion }) {
                                 onClick={() => handleAddComment()}
                                 style={{ cursor: "pointer" }}
                             >
-                                <Send />
+                                {createCommentMutation.isPending ? (
+                                    <CircularProgress size="24px" />
+                                ) : (
+                                    <Send />
+                                )}
                             </IconButton>
                         }
                     ></OutlinedInput>
-
-                    {commentsQuery.data?.map((comment, id) => {
-                        return <Comment key={id} comment={comment} />;
-                    })}
+                    {isPending ? (
+                        <Box
+                            sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "center",
+                                gap: 1,
+                            }}
+                        >
+                            <CircularProgress size="24px" />
+                            <Typography variant="body1">Loading...</Typography>
+                        </Box>
+                    ) : (
+                        comments?.map((comment, id) => (
+                            <Comment key={comment.id ?? id} comment={comment} />
+                        ))
+                    )}
                 </AccordionDetails>
             </Accordion>
             <Modal open={open} onClose={handleClose} title="Update Status">
@@ -319,14 +337,11 @@ export default function Suggestion({ suggestion }) {
                     <MenuItem value="implemented">Implemented</MenuItem>
                     <MenuItem value="declined">Declined</MenuItem>
                 </TextField>
-                <Button
-                    variant="contained"
-                    color="primary"
+                <LoadingButton
+                    isLoading={updateSuggestionMutation.isPending}
                     onClick={handleEditStatus}
-                    disabled={updateSuggestionMutation.isPending}
-                >
-                    Update
-                </Button>
+                    label="Update"
+                />
             </Modal>
         </>
     );

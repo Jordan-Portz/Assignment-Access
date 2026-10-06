@@ -3,7 +3,6 @@ import {
     Button,
     CircularProgress,
     MenuItem,
-    Pagination,
     TextField,
     Typography,
 } from "@mui/material";
@@ -12,6 +11,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/react/lib/api";
 import Suggestion from "@/react/components/Suggestion";
 import Modal from "@/react/components/Modal";
+import LoadingButton from "@/react/components/LoadingButton";
 import { useState } from "react";
 
 export default function SuggestionBoard() {
@@ -27,6 +27,7 @@ export default function SuggestionBoard() {
     const [titleTouched, setTitleTouched] = useState(false);
     const [descriptionTouched, setDescriptionTouched] = useState(false);
     const [categoryTouched, setCategoryTouched] = useState(false);
+    const [searchTerm, setSearchTerm] = useState("");
     const queryClient = useQueryClient();
 
     const createSuggestionMutation = useMutation({
@@ -48,7 +49,14 @@ export default function SuggestionBoard() {
 
     if (isPending) {
         return (
-            <Box sx={{ display: "flex", justifyContent: "center", pt: 8 }}>
+            <Box
+                sx={{
+                    position: "absolute",
+                    top: "50%",
+                    left: "50%",
+                    transform: "translate(-50%, -50%)",
+                }}
+            >
                 <CircularProgress />
             </Box>
         );
@@ -61,6 +69,12 @@ export default function SuggestionBoard() {
             </Typography>
         );
     }
+
+    const filteredSuggestions = suggestions?.filter((suggestion) =>
+        suggestion?.title
+            .toLowerCase()
+            .includes(searchTerm?.trim().toLowerCase()),
+    );
 
     function handleAddSuggestion() {
         createSuggestionMutation.mutate({
@@ -82,22 +96,37 @@ export default function SuggestionBoard() {
 
     return (
         <>
-            <Button
-                variant="contained"
-                color="primary"
-                endIcon={<AddBox />}
-                onClick={() => handleOpen()}
-                style={{ marginBottom: "16px" }}
+            <Box
+                sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    gap: 2,
+                    mb: 2,
+                }}
             >
-                Add Suggestion
-            </Button>
+                <Button
+                    variant="contained"
+                    color="primary"
+                    endIcon={<AddBox />}
+                    onClick={() => handleOpen()}
+                >
+                    Add Suggestion
+                </Button>
+                <TextField
+                    type="search"
+                    size="small"
+                    label="Search Suggestions"
+                    placeholder="Search by title..."
+                    value={searchTerm}
+                    slotProps={{ inputLabel: { shrink: true } }}
+                    onChange={(event) => setSearchTerm(event.target.value)}
+                ></TextField>
+            </Box>
 
-            {suggestions.map((suggestion, id) => {
+            {filteredSuggestions?.map((suggestion, id) => {
                 return <Suggestion key={id} suggestion={suggestion} />;
             })}
-            {/* <Pagination
-                count={Math.ceil(suggestions?.length / 10)}
-            ></Pagination> */}
 
             <Modal open={open} onClose={handleClose} title="Add Suggestion">
                 <TextField
@@ -142,19 +171,16 @@ export default function SuggestionBoard() {
                             "Failed to add suggestion."}
                     </Typography>
                 )}
-                <Button
-                    variant="contained"
-                    color="primary"
+                <LoadingButton
+                    isLoading={createSuggestionMutation.isPending}
                     onClick={handleAddSuggestion}
                     disabled={
                         title.trim() === "" ||
                         description.trim() === "" ||
-                        category === "" ||
-                        createSuggestionMutation.isPending
+                        category === ""
                     }
-                >
-                    Add
-                </Button>
+                    label="Add"
+                />
             </Modal>
         </>
     );

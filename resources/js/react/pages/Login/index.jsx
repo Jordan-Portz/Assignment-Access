@@ -1,8 +1,9 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
+import { Box, TextField, Typography } from "@mui/material";
 import { useState } from "react";
 import { api } from "@/react/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import LoadingButton from "@/react/components/LoadingButton";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -77,14 +78,12 @@ export default function Login() {
                 error={loginError !== ""}
                 helperText={loginError}
             ></TextField>
-            <Button
-                color="primary"
-                variant="contained"
+            <LoadingButton
+                isLoading={loginMutation.isPending}
                 onClick={handleLogin}
-                disabled={!email || !password || loginMutation.isPending}
-            >
-                Login
-            </Button>
+                disabled={!email || !password}
+                label="Login"
+            />
         </Box>
     );
 }
