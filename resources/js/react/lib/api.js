@@ -40,7 +40,7 @@ export const api = {
     createComment: (suggestionId, message) =>
         request("POST", `/suggestions/${suggestionId}/comments`, { message }),
     getComments: (suggestionId) =>
-        request("GET", `/suggestion/${suggestionId}/comments`),
+        request("GET", `/suggestions/${suggestionId}/comments`),
 
     // Vote
     setVote: (suggestionId, vote) =>

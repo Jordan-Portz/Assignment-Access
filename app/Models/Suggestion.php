@@ -24,14 +24,14 @@ class Suggestion extends Model
         'category' => \App\Enums\SuggestionCategory::class
     ];
 
-    public function comments(): HasMany
-    {
-        return $this->hasMany(Comment::class);
-    }
-
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+    
+    public function comments(): HasMany
+    {
+        return $this->hasMany(Comment::class);
     }
 
     public function votes(): HasMany

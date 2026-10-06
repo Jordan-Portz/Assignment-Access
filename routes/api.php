@@ -16,6 +16,7 @@ Route::put('/suggestions/{suggestion}/vote', [VoteController::class, 'upsert']);
 
 // Comment
 Route::post('/suggestions/{suggestion}/comments', [CommentController::class, 'store']);
-Route::get('/suggestion/{suggestion}/comments',[CommentController::class, 'index']);
+Route::get('/suggestions/{suggestion}/comments',[CommentController::class, 'index']);
 
+// Suggestion
 Route::apiResource('suggestions', SuggestionController::class);
