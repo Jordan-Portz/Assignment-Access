@@ -13,7 +13,11 @@ class VoteSeeder extends Seeder
     public function run(): void
     {
         Vote::factory()->count(50)->make()
-            ->unique(fn (Vote $vote) => "{$vote->suggestion_id}:{$vote->user_id}")
-            ->each(fn (Vote $vote) => $vote->save());
+            ->unique(function (Vote $vote) {
+                return "{$vote->suggestion_id}:{$vote->user_id}";
+            })
+            ->each(function (Vote $vote) {
+                $vote->save();
+            });
     }
 }

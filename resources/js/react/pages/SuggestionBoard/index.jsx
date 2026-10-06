@@ -1,8 +1,9 @@
-import { AddBox } from "@mui/icons-material";
+import { AddBox, Search } from "@mui/icons-material";
 import {
     Box,
     Button,
     CircularProgress,
+    InputAdornment,
     MenuItem,
     TextField,
     Typography,
@@ -186,17 +187,30 @@ export default function SuggestionBoard() {
                         placeholder="Search by title..."
                         value={searchTerm}
                         sx={{ flexShrink: 0 }}
-                        slotProps={{ inputLabel: { shrink: true } }}
+                        slotProps={{
+                            input: {
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <Search />
+                                    </InputAdornment>
+                                ),
+                            },
+                            inputLabel: { shrink: true },
+                        }}
                         onChange={(event) => setSearchTerm(event.target.value)}
                     />
                 </Box>
             </Box>
 
-            {filteredSuggestions?.map((suggestion) => {
-                return (
+            {filteredSuggestions?.length ? (
+                filteredSuggestions.map((suggestion) => (
                     <Suggestion key={suggestion.id} suggestion={suggestion} />
-                );
-            })}
+                ))
+            ) : (
+                <Typography variant="h6" sx={{ py: 3, textAlign: "center" }}>
+                    No suggestions found.
+                </Typography>
+            )}
 
             <Modal open={open} onClose={handleClose} title="Add Suggestion">
                 <TextField
