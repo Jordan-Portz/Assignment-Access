@@ -1,10 +1,19 @@
 import {
+    Chat,
+    Edit,
+    Send,
+    ThumbDownAlt,
+    ThumbDownOffAlt,
+    ThumbUpAlt,
+    ThumbUpOffAlt,
+} from "@mui/icons-material";
+import {
     Accordion,
     AccordionDetails,
     AccordionSummary,
     Box,
-    CircularProgress,
     Chip,
+    CircularProgress,
     Divider,
     IconButton,
     MenuItem,
@@ -12,38 +21,25 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import {
-    Chat,
-    Edit,
-    Send,
-    ThumbUpOffAlt,
-    ThumbUpAlt,
-    ThumbDownOffAlt,
-    ThumbDownAlt,
-} from "@mui/icons-material";
-import Comment from "@/react/components/Comment";
-import Modal from "@/react/components/Modal";
-import LoadingButton from "@/react/components/LoadingButton";
-import { useState } from "react";
-import { api } from "@/react/lib/api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-
-const statusColors = {
-    under_review: "warning",
-    planned: "info",
-    implemented: "success",
-    declined: "error",
-};
+import { useState } from "react";
+import Comment from "@/react/components/Comment";
+import LoadingButton from "@/react/components/LoadingButton";
+import Modal from "@/react/components/Modal";
+import { api } from "@/react/lib/api";
+import {
+    suggestionStatuses,
+    suggestionCategories,
+} from "@/react/lib/suggestionOptions";
 
 export default function Suggestion({ suggestion }) {
     const [comment, setComment] = useState("");
     const [expanded, setExpanded] = useState(false);
     const [status, setStatus] = useState(suggestion?.status || "");
+    const [pendingVote, setPendingVote] = useState(null);
     const [open, setOpen] = useState(false);
     const handleOpen = () => setOpen(true);
-    const handleClose = () => {
-        setOpen(false);
-    };
+    const handleClose = () => setOpen(false);
     const queryClient = useQueryClient();
 
     const { data: user } = useQuery({
@@ -77,15 +73,20 @@ export default function Suggestion({ suggestion }) {
         onSuccess: async () => {
             await queryClient.invalidateQueries({ queryKey: ["suggestions"] });
         },
+        onSettled: () => {
+            setPendingVote(null);
+        },
     });
 
-    const { data: comments, isPending } = useQuery({
+    const {
+        data: comments,
+        isPending,
+        isError,
+    } = useQuery({
         queryKey: ["comments", suggestion?.id],
         queryFn: () => api.getComments(suggestion?.id),
         enabled: expanded && !!suggestion?.id,
     });
-
-    const canEditStatus = Boolean(user?.is_admin);
 
     function handleAddComment() {
         createCommentMutation.mutate(comment.trim());
@@ -94,6 +95,7 @@ export default function Suggestion({ suggestion }) {
     function handleVote(vote) {
         if (voteMutation.isPending) return;
 
+        setPendingVote(vote);
         voteMutation.mutate(suggestion?.user_vote === vote ? 0 : vote);
     }
 
@@ -103,19 +105,34 @@ export default function Suggestion({ suggestion }) {
         });
     }
 
-    function formatEnumName(value) {
-        return value
-            ?.replace(/_/g, " ")
-            .replace(/\b\w/g, (letter) => letter.toUpperCase());
-    }
+    const canEditStatus = Boolean(user?.is_admin);
+
+    const currentStatus = suggestionStatuses.find(
+        (option) => option.value === suggestion?.status,
+    );
+
+    const currentCategory = suggestionCategories.find(
+        (option) => option.value === suggestion?.category,
+    );
+
+    const interactionControlStyles = {
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 1,
+        border: "1px solid",
+        borderColor: "divider",
+        borderRadius: "16px",
+        p: "4px 8px",
+        cursor: "pointer",
+        "&:hover": {
+            backgroundColor: "action.hover",
+            borderColor: "text.secondary",
+        },
+    };
 
     return (
         <>
-            <Accordion
-                expanded={expanded}
-                disableGutters
-                style={{ marginBottom: "16px" }}
-            >
+            <Accordion expanded={expanded} disableGutters sx={{ mb: "16px" }}>
                 <AccordionSummary
                     sx={{
                         "&.MuiButtonBase-root.MuiAccordionSummary-root": {
@@ -138,19 +155,14 @@ export default function Suggestion({ suggestion }) {
                                 width: "100%",
                             }}
                         >
-                            <Typography
-                                variant="h6"
-                                style={{ marginRight: "8px" }}
-                            >
+                            <Typography variant="h6" sx={{ mr: "8px" }}>
                                 {suggestion?.title}
                             </Typography>
                             <Chip
                                 onClick={canEditStatus ? handleOpen : undefined}
                                 label={
                                     <>
-                                        <span>
-                                            {formatEnumName(suggestion?.status)}
-                                        </span>
+                                        <span>{currentStatus?.label}</span>
                                         {canEditStatus && (
                                             <Edit
                                                 sx={{
@@ -161,17 +173,14 @@ export default function Suggestion({ suggestion }) {
                                         )}
                                     </>
                                 }
-                                color={
-                                    statusColors[suggestion?.status] ??
-                                    "default"
-                                }
+                                color={currentStatus?.color ?? "default"}
                                 sx={{
                                     width: 140,
                                     "& .MuiChip-label": {
                                         display: "flex",
                                         alignItems: "center",
                                         justifyContent: "center",
-                                        gap: 0.5,
+                                        gap: 1,
                                     },
                                 }}
                             />
@@ -184,8 +193,8 @@ export default function Suggestion({ suggestion }) {
                             }}
                         >
                             <Typography
-                                style={{
-                                    fontSize: "12px",
+                                sx={{
+                                    fontSize: 12,
                                     fontWeight: "bold",
                                 }}
                             >
@@ -197,7 +206,7 @@ export default function Suggestion({ suggestion }) {
                                 flexItem
                             />
                             <Chip
-                                label={formatEnumName(suggestion?.category)}
+                                label={currentCategory?.label}
                                 size="small"
                                 variant="outlined"
                             />
@@ -206,45 +215,26 @@ export default function Suggestion({ suggestion }) {
                     <Typography>{suggestion?.description}</Typography>
                     <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
                         <Box
-                            sx={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: "8px",
-                                border: "1px solid #ccc",
-                                borderRadius: "16px",
-                                p: "4px 8px",
-                                cursor: "pointer",
-                                "&:hover": {
-                                    backgroundColor: "action.hover",
-                                    borderColor: "text.secondary",
-                                },
-                            }}
+                            sx={{ ...interactionControlStyles }}
                             onClick={() => handleVote(1)}
                         >
-                            {suggestion?.user_vote === 1 ? (
+                            {voteMutation.isPending && pendingVote === 1 ? (
+                                <CircularProgress size="24px" />
+                            ) : suggestion?.user_vote === 1 ? (
                                 <ThumbUpAlt color="success" />
                             ) : (
                                 <ThumbUpOffAlt />
                             )}
+
                             <Typography>{suggestion?.upvotes}</Typography>
                         </Box>
                         <Box
-                            sx={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: "8px",
-                                border: "1px solid #ccc",
-                                borderRadius: "16px",
-                                p: "4px 8px",
-                                cursor: "pointer",
-                                "&:hover": {
-                                    backgroundColor: "action.hover",
-                                    borderColor: "text.secondary",
-                                },
-                            }}
+                            sx={{ ...interactionControlStyles }}
                             onClick={() => handleVote(-1)}
                         >
-                            {suggestion?.user_vote === -1 ? (
+                            {voteMutation.isPending && pendingVote === -1 ? (
+                                <CircularProgress size="24px" />
+                            ) : suggestion?.user_vote === -1 ? (
                                 <ThumbDownAlt color="error" />
                             ) : (
                                 <ThumbDownOffAlt />
@@ -254,18 +244,8 @@ export default function Suggestion({ suggestion }) {
                         </Box>
                         <Box
                             sx={{
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: 1,
-                                border: "1px solid #ccc",
-                                borderRadius: "16px",
-                                p: "4px 8px",
-                                cursor: "pointer",
+                                ...interactionControlStyles,
                                 color: expanded ? "primary.main" : "black",
-                                "&:hover": {
-                                    backgroundColor: "action.hover",
-                                    borderColor: "text.secondary",
-                                },
                             }}
                             onClick={() => setExpanded(!expanded)}
                         >
@@ -284,9 +264,9 @@ export default function Suggestion({ suggestion }) {
                         value={comment}
                         onChange={(e) => setComment(e.target.value)}
                         placeholder="Add a comment..."
-                        style={{
-                            padding: "4px 8px",
-                            marginBottom: "16px",
+                        sx={{
+                            p: "4px 8px",
+                            mb: "16px",
                         }}
                         endAdornment={
                             <IconButton
@@ -295,8 +275,8 @@ export default function Suggestion({ suggestion }) {
                                     !comment.trim() ||
                                     createCommentMutation.isPending
                                 }
-                                onClick={() => handleAddComment()}
-                                style={{ cursor: "pointer" }}
+                                onClick={handleAddComment}
+                                sx={{ cursor: "pointer" }}
                             >
                                 {createCommentMutation.isPending ? (
                                     <CircularProgress size="24px" />
@@ -305,7 +285,7 @@ export default function Suggestion({ suggestion }) {
                                 )}
                             </IconButton>
                         }
-                    ></OutlinedInput>
+                    />
                     {isPending ? (
                         <Box
                             sx={{
@@ -318,9 +298,13 @@ export default function Suggestion({ suggestion }) {
                             <CircularProgress size="24px" />
                             <Typography variant="body1">Loading...</Typography>
                         </Box>
+                    ) : isError ? (
+                        <Typography color="error" sx={{ pt: 4 }}>
+                            Failed to load suggestions.
+                        </Typography>
                     ) : (
-                        comments?.map((comment, id) => (
-                            <Comment key={comment.id ?? id} comment={comment} />
+                        comments?.map((comment) => (
+                            <Comment key={comment.id} comment={comment} />
                         ))
                     )}
                 </AccordionDetails>
@@ -332,10 +316,11 @@ export default function Suggestion({ suggestion }) {
                     select
                     onChange={(e) => setStatus(e.target.value)}
                 >
-                    <MenuItem value="under_review">Under Review</MenuItem>
-                    <MenuItem value="planned">Planned</MenuItem>
-                    <MenuItem value="implemented">Implemented</MenuItem>
-                    <MenuItem value="declined">Declined</MenuItem>
+                    {suggestionStatuses?.map(({ value, label }) => (
+                        <MenuItem key={value} value={value}>
+                            {label}
+                        </MenuItem>
+                    ))}
                 </TextField>
                 <LoadingButton
                     isLoading={updateSuggestionMutation.isPending}

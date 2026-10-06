@@ -1,11 +1,11 @@
 import CssBaseline from "@mui/material/CssBaseline";
-import { ThemeProvider, createTheme } from "@mui/material/styles";
-import { useEffect, useState } from "react";
+import { createTheme, ThemeProvider } from "@mui/material/styles";
+import { useEffect } from "react";
 
 import { ColorModeContext } from "./ColorModeContext";
 
 export default function AppThemeProvider({ children }) {
-    const [mode, setMode] = useState("light");
+    const mode = "light";
 
     useEffect(() => {
         try {
@@ -13,7 +13,7 @@ export default function AppThemeProvider({ children }) {
         } catch {
             // ignore
         }
-    }, [mode]);
+    }, []);
 
     const theme = createTheme({
         palette: {

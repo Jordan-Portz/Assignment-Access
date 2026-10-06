@@ -1,3 +1,4 @@
+import { Logout } from "@mui/icons-material";
 import {
     AppBar,
     Box,
@@ -7,9 +8,8 @@ import {
     Toolbar,
     Typography,
 } from "@mui/material";
-import { Logout } from "@mui/icons-material";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Outlet, useNavigate } from "react-router-dom";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/react/lib/api";
 
 export default function App() {
@@ -28,21 +28,6 @@ export default function App() {
             navigate("/");
         },
     });
-
-    if (logoutMutation.isPending) {
-        return (
-            <Box
-                sx={{
-                    position: "absolute",
-                    top: "50%",
-                    left: "50%",
-                    transform: "translate(-50%, -50%)",
-                }}
-            >
-                <CircularProgress />
-            </Box>
-        );
-    }
 
     function handleLogout() {
         logoutMutation.mutate();
@@ -70,9 +55,7 @@ export default function App() {
                             </Typography>
                             <IconButton
                                 sx={{ color: "inherit" }}
-                                onClick={() => {
-                                    handleLogout();
-                                }}
+                                onClick={handleLogout}
                                 disabled={logoutMutation.isPending}
                             >
                                 <Logout />
@@ -88,9 +71,22 @@ export default function App() {
                     overflowY: "auto",
                 }}
             >
-                <Container maxWidth="lg" sx={{ pt: 3 }}>
-                    <Outlet />
-                </Container>
+                {logoutMutation.isPending ? (
+                    <Box
+                        sx={{
+                            height: "100%",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                        }}
+                    >
+                        <CircularProgress />
+                    </Box>
+                ) : (
+                    <Container maxWidth="lg" sx={{ pt: 3 }}>
+                        <Outlet />
+                    </Container>
+                )}
             </Box>
         </Box>
     );

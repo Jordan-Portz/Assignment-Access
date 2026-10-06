@@ -1,0 +1,15 @@
+export const centeredContainerSx = {
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "stretch",
+    width: "min(400px, calc(100% - 32px))",
+    p: 2,
+    gap: 2,
+    border: "1px solid #ccc",
+    backgroundColor: "background.paper",
+    borderRadius: "16px",
+};

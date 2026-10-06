@@ -1,9 +1,10 @@
 import { Box, TextField, Typography } from "@mui/material";
-import { useState } from "react";
-import { api } from "@/react/lib/api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import LoadingButton from "@/react/components/LoadingButton";
+import { api } from "@/react/lib/api";
+import { centeredContainerSx } from "@/react/styles/common";
 
 export default function Login() {
     const [email, setEmail] = useState("");
@@ -37,22 +38,7 @@ export default function Login() {
     }
 
     return (
-        <Box
-            sx={{
-                position: "absolute",
-                top: "50%",
-                left: "50%",
-                transform: "translate(-50%, -50%)",
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "stretch",
-                width: 400,
-                p: 2,
-                gap: 2,
-                border: "1px solid #ccc",
-                borderRadius: "16px",
-            }}
-        >
+        <Box sx={centeredContainerSx}>
             <Typography variant="h5" sx={{ textAlign: "center" }}>
                 Log in
             </Typography>
@@ -66,7 +52,7 @@ export default function Login() {
                 }}
                 error={emailError !== "" || loginError !== ""}
                 helperText={emailError}
-            ></TextField>
+            />
             <TextField
                 label="Password"
                 type="password"
@@ -77,7 +63,7 @@ export default function Login() {
                 }}
                 error={loginError !== ""}
                 helperText={loginError}
-            ></TextField>
+            />
             <LoadingButton
                 isLoading={loginMutation.isPending}
                 onClick={handleLogin}

@@ -1,3 +1,4 @@
+import { AddBox } from "@mui/icons-material";
 import {
     Box,
     Button,
@@ -6,13 +7,16 @@ import {
     TextField,
     Typography,
 } from "@mui/material";
-import { AddBox } from "@mui/icons-material";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api } from "@/react/lib/api";
-import Suggestion from "@/react/components/Suggestion";
-import Modal from "@/react/components/Modal";
-import LoadingButton from "@/react/components/LoadingButton";
 import { useState } from "react";
+import LoadingButton from "@/react/components/LoadingButton";
+import Modal from "@/react/components/Modal";
+import Suggestion from "@/react/components/Suggestion";
+import { api } from "@/react/lib/api";
+import {
+    suggestionStatuses,
+    suggestionCategories,
+} from "@/react/lib/suggestionOptions";
 
 export default function SuggestionBoard() {
     const [open, setOpen] = useState(false);
@@ -24,10 +28,12 @@ export default function SuggestionBoard() {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [category, setCategory] = useState("");
-    const [titleTouched, setTitleTouched] = useState(false);
-    const [descriptionTouched, setDescriptionTouched] = useState(false);
-    const [categoryTouched, setCategoryTouched] = useState(false);
+    const [touched, setTouched] = useState({});
     const [searchTerm, setSearchTerm] = useState("");
+    const [filters, setFilters] = useState({
+        category: "all",
+        status: "all",
+    });
     const queryClient = useQueryClient();
 
     const createSuggestionMutation = useMutation({
@@ -70,11 +76,23 @@ export default function SuggestionBoard() {
         );
     }
 
-    const filteredSuggestions = suggestions?.filter((suggestion) =>
-        suggestion?.title
+    const filteredSuggestions = suggestions?.filter((suggestion) => {
+        const matchSearch = suggestion?.title
             .toLowerCase()
-            .includes(searchTerm?.trim().toLowerCase()),
-    );
+            .includes(searchTerm?.trim().toLowerCase());
+
+        const matchCategory =
+            filters.category === "all" ||
+            suggestion?.category === filters.category;
+
+        const matchStatus =
+            filters.status === "all" || suggestion?.status === filters.status;
+
+        return matchSearch && matchCategory && matchStatus;
+    });
+
+    const markTouched = (field) => () =>
+        setTouched((current) => ({ ...current, [field]: true }));
 
     function handleAddSuggestion() {
         createSuggestionMutation.mutate({
@@ -89,9 +107,7 @@ export default function SuggestionBoard() {
         setTitle("");
         setDescription("");
         setCategory("");
-        setTitleTouched(false);
-        setDescriptionTouched(false);
-        setCategoryTouched(false);
+        setTouched({});
     }
 
     return (
@@ -100,32 +116,86 @@ export default function SuggestionBoard() {
                 sx={{
                     display: "flex",
                     alignItems: "center",
-                    justifyContent: "space-between",
-                    gap: 2,
                     mb: 2,
+                    flexWrap: "wrap",
                 }}
             >
                 <Button
                     variant="contained"
                     color="primary"
                     endIcon={<AddBox />}
-                    onClick={() => handleOpen()}
+                    onClick={handleOpen}
                 >
                     Add Suggestion
                 </Button>
-                <TextField
-                    type="search"
-                    size="small"
-                    label="Search Suggestions"
-                    placeholder="Search by title..."
-                    value={searchTerm}
-                    slotProps={{ inputLabel: { shrink: true } }}
-                    onChange={(event) => setSearchTerm(event.target.value)}
-                ></TextField>
+                <Box
+                    sx={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "flex-end",
+                        gap: 2,
+                        ml: "auto",
+                        flexWrap: "wrap",
+                    }}
+                >
+                    <TextField
+                        label="Category"
+                        select
+                        size="small"
+                        sx={{ width: 200, flexShrink: 0 }}
+                        slotProps={{ inputLabel: { shrink: true } }}
+                        value={filters.category}
+                        onChange={(e) =>
+                            setFilters((current) => ({
+                                ...current,
+                                category: e.target.value,
+                            }))
+                        }
+                    >
+                        <MenuItem value="all">All Categories</MenuItem>
+                        {suggestionCategories?.map(({ value, label }) => (
+                            <MenuItem key={value} value={value}>
+                                {label}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                    <TextField
+                        label="Status"
+                        select
+                        size="small"
+                        sx={{ width: 200, flexShrink: 0 }}
+                        slotProps={{ inputLabel: { shrink: true } }}
+                        value={filters.status}
+                        onChange={(e) =>
+                            setFilters((current) => ({
+                                ...current,
+                                status: e.target.value,
+                            }))
+                        }
+                    >
+                        <MenuItem value="all">All Statuses</MenuItem>
+                        {suggestionStatuses?.map(({ value, label }) => (
+                            <MenuItem key={value} value={value}>
+                                {label}
+                            </MenuItem>
+                        ))}
+                    </TextField>
+                    <TextField
+                        type="search"
+                        size="small"
+                        placeholder="Search by title..."
+                        value={searchTerm}
+                        sx={{ flexShrink: 0 }}
+                        slotProps={{ inputLabel: { shrink: true } }}
+                        onChange={(event) => setSearchTerm(event.target.value)}
+                    />
+                </Box>
             </Box>
 
-            {filteredSuggestions?.map((suggestion, id) => {
-                return <Suggestion key={id} suggestion={suggestion} />;
+            {filteredSuggestions?.map((suggestion) => {
+                return (
+                    <Suggestion key={suggestion.id} suggestion={suggestion} />
+                );
             })}
 
             <Modal open={open} onClose={handleClose} title="Add Suggestion">
@@ -134,20 +204,20 @@ export default function SuggestionBoard() {
                     variant="outlined"
                     multiline
                     required
-                    error={titleTouched && title.trim() === ""}
+                    error={touched.title && title.trim() === ""}
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    onBlur={() => setTitleTouched(true)}
+                    onBlur={markTouched("title")}
                 />
                 <TextField
                     label="Description"
                     variant="outlined"
                     multiline
                     required
-                    error={descriptionTouched && description.trim() === ""}
+                    error={touched.description && description.trim() === ""}
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    onBlur={() => setDescriptionTouched(true)}
+                    onBlur={markTouched("description")}
                     rows={6}
                 />
                 <TextField
@@ -155,15 +225,15 @@ export default function SuggestionBoard() {
                     value={category}
                     select
                     required
-                    error={categoryTouched && category === ""}
+                    error={touched.category && category === ""}
                     onChange={(e) => setCategory(e.target.value)}
-                    onBlur={() => setCategoryTouched(true)}
+                    onBlur={markTouched("category")}
                 >
-                    <MenuItem value="process">Process</MenuItem>
-                    <MenuItem value="product">Product</MenuItem>
-                    <MenuItem value="member_experience">
-                        Member Experience
-                    </MenuItem>
+                    {suggestionCategories?.map(({ value, label }) => (
+                        <MenuItem key={value} value={value}>
+                            {label}
+                        </MenuItem>
+                    ))}
                 </TextField>
                 {createSuggestionMutation.isError && (
                     <Typography color="error" role="alert">

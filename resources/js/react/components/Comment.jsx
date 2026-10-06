@@ -4,11 +4,11 @@ export default function Comment({ comment }) {
     return (
         <Box>
             <Divider />
-            <Box style={{ padding: "8px 0px" }}>
-                <Typography style={{ fontSize: "12px", fontWeight: "bold" }}>
+            <Box sx={{ p: "8px 0px" }}>
+                <Typography sx={{ fontSize: 12, fontWeight: "bold" }}>
                     {comment?.user?.name}
                 </Typography>
-                <Typography style={{ whiteSpace: "pre-line" }}>
+                <Typography sx={{ whiteSpace: "pre-line" }}>
                     {comment?.message}
                 </Typography>
             </Box>
