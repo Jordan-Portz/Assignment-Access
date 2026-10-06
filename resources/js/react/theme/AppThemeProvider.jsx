@@ -4,23 +4,8 @@ import { useEffect, useState } from "react";
 
 import { ColorModeContext } from "./ColorModeContext";
 
-function getInitialMode() {
-    try {
-        const saved = localStorage.getItem("color-mode");
-        if (saved === "light" || saved === "dark") return saved;
-    } catch {
-        // ignore
-    }
-    if (typeof window !== "undefined" && window.matchMedia) {
-        return window.matchMedia("(prefers-color-scheme: dark)").matches
-            ? "dark"
-            : "light";
-    }
-    return "light";
-}
-
 export default function AppThemeProvider({ children }) {
-    const [mode, setMode] = useState(getInitialMode);
+    const [mode, setMode] = useState("light");
 
     useEffect(() => {
         try {
@@ -30,20 +15,17 @@ export default function AppThemeProvider({ children }) {
         }
     }, [mode]);
 
-    const toggleColorMode = () =>
-        setMode((prev) => (prev === "light" ? "dark" : "light"));
-
     const theme = createTheme({
         palette: {
             mode,
-            primary: { main: mode === "light" ? "#1565C0" : "#90CAF9" },
-            secondary: { main: mode === "light" ? "#6A1B9A" : "#CE93D8" },
+            primary: { main: "#007680" },
+            secondary: { main: "#6A1B9A" },
         },
         shape: { borderRadius: 8 },
     });
 
     return (
-        <ColorModeContext.Provider value={{ mode, toggleColorMode }}>
+        <ColorModeContext.Provider value={{ mode }}>
             <ThemeProvider theme={theme}>
                 <CssBaseline />
                 {children}

@@ -42,6 +42,6 @@ class AuthController extends Controller
 
 	public function user(Request $request): JsonResponse
 	{
-		return response()->json($request->user()?->only(['id', 'name', 'email']));
+		return response()->json($request->user()?->only(['id', 'name', 'email', 'is_admin']));
 	}
 }

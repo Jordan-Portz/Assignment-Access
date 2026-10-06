@@ -18,7 +18,6 @@ export default function App() {
     const { data: user } = useQuery({
         queryKey: ["user"],
         queryFn: api.getCurrentUser,
-        retry: false,
     });
 
     const logoutMutation = useMutation({
@@ -45,10 +44,10 @@ export default function App() {
             <AppBar position="static" color="primary" elevation={1}>
                 <Toolbar>
                     <Typography variant="h6" sx={{ flexGrow: 1 }}>
-                        Access Suggest
+                        Access Suggestions
                     </Typography>
 
-                    {user && user.email && (
+                    {user?.email && (
                         <>
                             <Typography variant="body1">
                                 Logged in as: <strong>{user.name}</strong>

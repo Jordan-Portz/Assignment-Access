@@ -33,6 +33,7 @@ export const api = {
     getSuggestions: () => request("GET", "/suggestions"),
     getSuggestion: (id) => request("GET", `/suggestions/${id}`),
     createSuggestion: (data) => request("POST", "/suggestions", data),
+    updateSuggestion: (id, data) => request("PUT", `/suggestions/${id}`, data),
     deleteSuggestion: (id) => request("DELETE", `/suggestions/${id}`),
 
     // Comment

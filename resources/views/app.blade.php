@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Interview Starter</title>
+    <title>Access Suggestions</title>
     @viteReactRefresh
     @vite(['resources/js/react/main.jsx'])
 </head>

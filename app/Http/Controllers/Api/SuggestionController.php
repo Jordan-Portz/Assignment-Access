@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreSuggestionRequest;
+use App\Http\Requests\UpdateSuggestionRequest;
 use App\Models\Suggestion;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -39,6 +40,13 @@ class SuggestionController extends Controller
 
     public function show(Suggestion $suggestion): JsonResponse
     {
+        return response()->json($suggestion);
+    }
+
+    public function update(UpdateSuggestionRequest $request, Suggestion $suggestion): JsonResponse
+    {
+        $suggestion->update($request->validated());
+
         return response()->json($suggestion);
     }
 
