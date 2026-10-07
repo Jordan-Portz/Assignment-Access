@@ -12,7 +12,21 @@ Credit unions run on cooperative principles; member and staff voice matters. Bui
 
 ### Key feature / functionality
 
-### Outstanding Work
+- User accounts (login and logout)
+- Create new suggestions
+- Search and filter suggestions by category or status
+- Upvote and downvote suggestions to surface the most valuable ideas
+- Leave comments on suggestions to discuss implementation details or feedback
+- Admins can edit the status of suggestions to show current progress
+
+### Test Accounts
+
+Two demo accounts are included for local testing:
+
+- Admin: email: admin@example.com / pwd: test
+    - Can review and update suggestion statuses
+- Staff User: email: test@example.com / pwd: test
+    - Can create, vote on, and comment on suggestions
 
 ## Prerequisites
 

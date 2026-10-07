@@ -107,11 +107,11 @@ export default function Suggestion({ suggestion }) {
 
     const canEditStatus = Boolean(user?.is_admin);
 
-    const currentStatus = suggestionStatuses.find(
+    const currentStatus = suggestionStatuses?.find(
         (option) => option.value === suggestion?.status,
     );
 
-    const currentCategory = suggestionCategories.find(
+    const currentCategory = suggestionCategories?.find(
         (option) => option.value === suggestion?.category,
     );
 
